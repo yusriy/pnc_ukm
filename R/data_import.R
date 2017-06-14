@@ -1,30 +1,56 @@
+###############################################
+# TITLE: PARTICLE NUMBER COUNT IN KL ANALYSIS
+# AUTHOR: YUSRI YUSUP, PHD, USM
+# DATE: 2017-06-14
+# DATASET: MD FIROZ KHAN, UKM
+#
+###############################################
+
+#### LOAD NEEDED PACKAGES ####
 library(openair)
 
+#### DATA IMPORT ####
 pnc <- read.csv('data/PNC_UKMKL_Dr. Bari.csv', skip = 1, header = TRUE)
-
 date <- paste(pnc$Date, pnc$Time)
 date <- as.POSIXct(date, format = '%m/%d/%y %H:%M:%S', tz = 'Asia/Kuala_Lumpur')
 pnc <- pnc[,-c(1,2)]
 pnc <- cbind(date, pnc)
 rm(date)
 
-plot(pnc$date, pnc$X0.337um, type = 'l')
-plot(pnc$date, pnc$X0.4195um, type = 'l')
-plot(pnc$date, pnc$X0.522um, type = 'l')
-
-
-matrix_pnc <- as.matrix(pnc[,-1])
-cor_pnc <- cor(matrix_pnc)
-
-pca_pnc <- prcomp(matrix_pnc, center = TRUE, scale. = TRUE)
-print(pca_pnc)
-plot(pca_pnc, type = 'l')
-
+#### AVERAGING ####
 # Average daily and hourly
 pnc_hour <- timeAverage(pnc, avg.time = 'hour')
 pnc_day <- timeAverage(pnc,avg.time = 'day')
 
 
+
+#### MULTIVARIATE ANALYSIS ####
+### K-MEANS CLUSTERING
+# K-means clustering is an unsupervised learning algorithm
+#set.seed(1) # To ensure reproducibility
+#pnc_cluster <- kmeans(pnc[,2:17], 16, nstart = 10)
+#pnc_cluster
+
+# Determine number of clusters
+#pnc_no <- pnc[,2:6]
+#wss <- (nrow(pnc_no)-1)*sum(apply(pnc_no,2,var))
+#for (i in 2:15) wss[i] <- sum(kmeans(pnc_no, 
+#                                     centers=i)$withinss)
+#plot(1:15, wss, type="b", xlab="Number of Clusters",
+#     ylab="Within groups sum of squares")
+
+### PCA 
+matrix_pnc <- as.matrix(pnc[,-1])
+cor_pnc <- cor(matrix_pnc)
+pca_pnc <- prcomp(matrix_pnc, center = TRUE, scale. = TRUE)
+print(pca_pnc)
+summary(pca_pnc)
+plot(pca_pnc, type = 'l')
+
+
+#### PLOTS: POLAR PLOT ####
+
+#### PLOTS: TIME SERIES ####
 # Plot of hourly data 0.337 um
 jpeg('figs/337um.jpeg', width = 16, height = 8, units = 'cm', res = 300)
 par(mar = c(4.1,4.1,1.1,0.1))
@@ -185,6 +211,8 @@ plot(pnc_hour$date,pnc_hour$X9.0155um, type = 'l', xlab = 'Date',
 points(pnc_day$date,pnc_day$X9.0155um, pch = 19, col = 'black')
 dev.off()
 
+
+#### PLOTS: DIURNAL TRENDS ####
 # Diurnal trend plots
 x0337um <- timeVariation(pnc_hour,pollutant = c('X0.337um'), cols = 'black', 
                          xlab = c('Hour','Hour','Month','Weekday'),
