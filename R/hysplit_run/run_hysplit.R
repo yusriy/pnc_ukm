@@ -15,20 +15,20 @@ source('R/hysplit_run/getMet.R')
 source('R/hysplit_run/add.met.R')
 
 # Download the data, commented out so that the data is not downloaded again
-getMet(year=2016,month=11)
-
+getMet(year=2016,month=1:10)
+#getMet(year=2017,month=1:4)
 # Run Hysplit, this function changes the working directory.
 # Need to change lat, long, name, hours, and height
 for(i in 2016){
   procTraj(lat=3.168434,lon=101.701301,year=i,
-           name='kl',hours=72,height=500,
+           name='kl1',hours=72,height=500,
            met='/Users/Yusri/Documents/Work/Data_analysis/pnc_ukm/data/TrajData/',
            out='/Users/Yusri/Documents/Work/Data_analysis/pnc_ukm/data/TrajProc/')
 }
 # Reset working directory
 setwd('/Users/Yusri/Documents/Work/Data_analysis/pnc_ukm/')
 # Import data
-trajKL<-importTraj(site='kl',year=2016,local='data/TrajProc/')
+trajKL<-importTraj(site='kl',year=2017,local='data/TrajProc/')
 
 
 trajLevel(trajKL, projection = 'mercator', orientation = c(90,90,0),
